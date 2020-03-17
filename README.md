@@ -1,4 +1,4 @@
-# Google Dialog Flow Twilio Flex
+# Twilio Flex - Google Dialogflow
 
 This project is to showcase how to connect Google Dialogflow into Twilio Flex.
 
