@@ -1,0 +1,318 @@
+{
+    "description": "Google-Dialogflow-Webchat-Flow",
+    "states": [
+      {
+        "name": "Trigger",
+        "type": "InitialState",
+        "properties": {
+          "offset": {
+            "x": 0,
+            "y": 10
+          },
+          "flow_url": "https://webhooks.twilio.com/v1/Accounts/AC8be5bd3d8f494f953429e7e92b2a879d/Flows/FWdc71807f6ec846acb2bda26aef9533de"
+        },
+        "transitions": [
+          {
+            "event": "incomingMessage",
+            "conditions": [],
+            "next": "FF6e09efaf4f4ffb4e9e614fb0d0e51c1a",
+            "uuid": "b393f54c-918f-4f0a-bcd4-934432cae98e"
+          },
+          {
+            "event": "incomingCall",
+            "conditions": [],
+            "next": null,
+            "uuid": "e76d6a0c-27dc-4e37-a915-b7cb29f7ec7a"
+          },
+          {
+            "event": "incomingRequest",
+            "conditions": [],
+            "next": null,
+            "uuid": "84897f4d-f314-4592-bfca-a9c163f88fa4"
+          }
+        ],
+        "sid": "FF6f59aea029c07e801ce1911b57239759"
+      },
+      {
+        "name": "SendGoogleMessage",
+        "type": "MessagePrompt",
+        "properties": {
+          "offset": {
+            "x": 740,
+            "y": 1170
+          },
+          "body": "{{flow.variables.googleMessage}}",
+          "from": "{{flow.channel.address}}",
+          "timeout": 3600,
+          "save_response_as": null,
+          "media_url": null,
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "attributes": null
+        },
+        "transitions": [
+          {
+            "event": "incomingMessage",
+            "conditions": [],
+            "next": "FF9ffb16c8b16ab6d4146d3310f37ef48d",
+            "uuid": "b79492e3-b215-4943-9ef6-cac35e46821f"
+          },
+          {
+            "event": "timeout",
+            "conditions": [],
+            "next": null,
+            "uuid": "c37930d9-591b-4248-9f36-83a3bbb99d97"
+          },
+          {
+            "event": "deliveryFailure",
+            "conditions": [],
+            "next": null,
+            "uuid": "97c2d615-d2c8-4c3e-9369-9746d831b0f1"
+          }
+        ],
+        "sid": "FFab480e9bc7404a457000ba72d063716b"
+      },
+      {
+        "name": "SendToAgent",
+        "type": "Message",
+        "properties": {
+          "offset": {
+            "x": -820,
+            "y": 730
+          },
+          "body": "Please wait while we transfer you to the next available agent.",
+          "from": "{{flow.channel.address}}",
+          "to": "{{contact.channel.address}}",
+          "media_url": null,
+          "service": "{{trigger.message.InstanceSid}}",
+          "channel": "{{trigger.message.ChannelSid}}",
+          "attributes": null
+        },
+        "transitions": [
+          {
+            "event": "sent",
+            "conditions": [],
+            "next": "FF8cb8f3e14560283ec7a04cc6de49167d",
+            "uuid": "074cf37b-7bdf-4eea-aef1-0998621156e7"
+          },
+          {
+            "event": "failed",
+            "conditions": [],
+            "next": null,
+            "uuid": "2c92fec8-0473-4a30-ac4b-c50eca8dc039"
+          }
+        ],
+        "sid": "FFef68c492851b4b08c40866ec06a670d5"
+      },
+      {
+        "name": "SetVariables",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 100,
+            "y": 700
+          },
+          "variables": [
+            {
+              "key": "sessionId",
+              "value": "{{widgets.Dialogflow.parsed.sessionId}}",
+              "index": "0"
+            },
+            {
+              "key": "googleMessage",
+              "value": "{{widgets.Dialogflow.parsed.googleMessage}}",
+              "index": "1"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FFe0701acaffc24c3579343a8763bd4111",
+            "uuid": "163daf77-8b9c-47e5-9630-dbd26a90a1da"
+          }
+        ],
+        "sid": "FFe9b0dac54b2cf3fc4fa9dbf343504a02"
+      },
+      {
+        "name": "Dialogflow",
+        "type": "Function",
+        "properties": {
+          "offset": {
+            "x": 80,
+            "y": 320
+          },
+          "url": "https://denim-angelfish-7076.twil.io/google-dialogflow",
+          "timeout": null,
+          "parameters": [
+            {
+              "key": "message",
+              "value": "{{flow.variables.message}}"
+            },
+            {
+              "key": "sessionId",
+              "value": "{{flow.variables.sessionId}}"
+            }
+          ],
+          "service_sid": null,
+          "function_sid": null,
+          "environment_sid": null
+        },
+        "transitions": [
+          {
+            "event": "success",
+            "conditions": [],
+            "next": "FFe9b0dac54b2cf3fc4fa9dbf343504a02",
+            "uuid": "55431cdc-7156-437d-b2f8-c492bb578fe2"
+          },
+          {
+            "event": "fail",
+            "conditions": [],
+            "next": "FFef68c492851b4b08c40866ec06a670d5",
+            "uuid": "9da5efb4-caff-4694-8e29-b389b68edcb4"
+          }
+        ],
+        "sid": "FF583cb47b858aa8db70ac7144782174ae"
+      },
+      {
+        "name": "IsTransfer",
+        "type": "Branch",
+        "properties": {
+          "offset": {
+            "x": -40,
+            "y": 1110
+          },
+          "input": "{{flow.variables.googleMessage}}"
+        },
+        "transitions": [
+          {
+            "event": "noMatch",
+            "conditions": [],
+            "next": "FFab480e9bc7404a457000ba72d063716b",
+            "uuid": "6362e26d-1f0b-4513-8d7f-0972c89f309c"
+          },
+          {
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value contains Transferring",
+                "type": "contains",
+                "arguments": [
+                  "{{flow.variables.googleMessage}}"
+                ],
+                "value": "Transferring"
+              }
+            ],
+            "next": "FFef68c492851b4b08c40866ec06a670d5",
+            "uuid": "2949b16a-3146-4b2a-8c87-3073b050a13c"
+          },
+          {
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value contains transfer",
+                "type": "contains",
+                "arguments": [
+                  "{{flow.variables.googleMessage}}"
+                ],
+                "value": "transfer"
+              }
+            ],
+            "next": "FFef68c492851b4b08c40866ec06a670d5",
+            "uuid": "032e788c-ec03-4d8f-838e-9ef2ec8b0585"
+          }
+        ],
+        "sid": "FFe0701acaffc24c3579343a8763bd4111"
+      },
+      {
+        "name": "SetCustomerMessageGreeting",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 680,
+            "y": 300
+          },
+          "variables": [
+            {
+              "key": "message",
+              "value": "{{trigger.message.Body}}"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FF583cb47b858aa8db70ac7144782174ae",
+            "uuid": "3801edae-d525-4ca6-9ac7-dcee7173ce35"
+          }
+        ],
+        "sid": "FF6e09efaf4f4ffb4e9e614fb0d0e51c1a"
+      },
+      {
+        "name": "SetCustomerMessage",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 770,
+            "y": 880
+          },
+          "variables": [
+            {
+              "key": "message",
+              "value": "{{widgets.SendGoogleMessage.inbound.Body}}",
+              "index": 0
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FF583cb47b858aa8db70ac7144782174ae",
+            "uuid": "ebca0bcd-e4b6-4b02-a7ae-622abfc6d84f"
+          }
+        ],
+        "sid": "FF9ffb16c8b16ab6d4146d3310f37ef48d"
+      },
+      {
+        "name": "send_to_flex_1",
+        "type": "SendToFlex",
+        "properties": {
+          "offset": {
+            "x": -837,
+            "y": 1032
+          },
+          "workflow": "WW2df726e73c24e6318a7561c9737a9b74",
+          "channel": "TC13c5353d631dfb0b0bedbb7af67b31e2",
+          "attributes": "{\"name\": \"{{trigger.message.ChannelAttributes.from}}\", \"channelType\": \"{{trigger.message.ChannelAttributes.channel_type}}\", \"channelSid\": \"{{trigger.message.ChannelSid}}\",\"Dialogflow\": {\n\"currentIntent\": \"{{widgets.Dialogflow.parsed.currentIntent}} \",\n\"context\": \"{{widgets.Dialogflow.parsed.context}} \"\n}}",
+          "timeout": null,
+          "priority": null,
+          "waitUrl": null,
+          "waitUrlMethod": null
+        },
+        "transitions": [
+          {
+            "event": "callComplete",
+            "conditions": [],
+            "next": null,
+            "uuid": "ff0ad7f3-3fb8-4c03-b2e0-0e8b604ce3bb"
+          },
+          {
+            "event": "failedToEnqueue",
+            "conditions": [],
+            "next": null,
+            "uuid": "0c25b09d-64c4-413c-a857-d1af01be64b7"
+          },
+          {
+            "event": "callFailure",
+            "conditions": [],
+            "next": null,
+            "uuid": "9b9c7906-012f-4d8c-8df7-55d4697f2daf"
+          }
+        ],
+        "sid": "FF8cb8f3e14560283ec7a04cc6de49167d"
+      }
+    ]
+  }

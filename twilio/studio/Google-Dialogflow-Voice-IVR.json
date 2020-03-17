@@ -1,0 +1,344 @@
+{
+    "description": "Google-Dialogflow-Webchat-Flow",
+    "states": [
+      {
+        "name": "Trigger",
+        "type": "InitialState",
+        "properties": {
+          "offset": {
+            "x": 0,
+            "y": 10
+          },
+          "flow_url": "https://webhooks.twilio.com/v1/Accounts/AC8be5bd3d8f494f953429e7e92b2a879d/Flows/FW4a215091b7e08107ac3ee1be8a24cb40"
+        },
+        "transitions": [
+          {
+            "event": "incomingMessage",
+            "conditions": [],
+            "next": null,
+            "uuid": "ec0022d3-812f-4386-bebb-17b92917785d"
+          },
+          {
+            "event": "incomingCall",
+            "conditions": [],
+            "next": "FF6e09efaf4f4ffb4e9e614fb0d0e51c1a",
+            "uuid": "87aa2828-efa2-4a33-8272-3682ae38bd0f"
+          },
+          {
+            "event": "incomingRequest",
+            "conditions": [],
+            "next": null,
+            "uuid": "60545f05-8bd6-469c-ac0a-77390d6c863a"
+          }
+        ],
+        "sid": "FF6f59aea029c07e801ce1911b57239759"
+      },
+      {
+        "name": "SetVariables",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": -160,
+            "y": 770
+          },
+          "variables": [
+            {
+              "key": "sessionId",
+              "value": "{{widgets.Dialogflow.parsed.sessionId}}",
+              "index": "0"
+            },
+            {
+              "key": "googleMessage",
+              "value": "{{widgets.Dialogflow.parsed.googleMessage}}",
+              "index": "1"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FFe0701acaffc24c3579343a8763bd4111",
+            "uuid": "d837b7b0-284a-4a8e-bf2a-eac4a24ceaec"
+          }
+        ],
+        "sid": "FFe9b0dac54b2cf3fc4fa9dbf343504a02"
+      },
+      {
+        "name": "Dialogflow",
+        "type": "Function",
+        "properties": {
+          "offset": {
+            "x": -170,
+            "y": 440
+          },
+          "url": "https://denim-angelfish-7076.twil.io/google-dialogflow",
+          "timeout": null,
+          "parameters": [
+            {
+              "key": "message",
+              "value": "{{flow.variables.message}}"
+            },
+            {
+              "key": "sessionId",
+              "value": "{{flow.variables.sessionId}}"
+            }
+          ],
+          "service_sid": null,
+          "function_sid": null,
+          "environment_sid": null
+        },
+        "transitions": [
+          {
+            "event": "success",
+            "conditions": [],
+            "next": "FFe9b0dac54b2cf3fc4fa9dbf343504a02",
+            "uuid": "5d753788-10b0-49f2-9f0e-ec13fc02871c"
+          },
+          {
+            "event": "fail",
+            "conditions": [],
+            "next": "FF52ea7392f7d77d58be687b99a25fd4cc",
+            "uuid": "05b3e261-27b9-41a2-a272-6dcff1bf442d"
+          }
+        ],
+        "sid": "FF583cb47b858aa8db70ac7144782174ae"
+      },
+      {
+        "name": "IsTransfer",
+        "type": "Branch",
+        "properties": {
+          "offset": {
+            "x": -210,
+            "y": 1110
+          },
+          "input": "{{flow.variables.googleMessage}}"
+        },
+        "transitions": [
+          {
+            "event": "noMatch",
+            "conditions": [],
+            "next": "FFb93c1e7c51d061583b4e598b48a74a90",
+            "uuid": "6e5357c2-33d6-47a2-8934-510e6baa3cc9"
+          },
+          {
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value contains Transferring",
+                "type": "contains",
+                "arguments": [
+                  "{{flow.variables.googleMessage}}"
+                ],
+                "value": "Transferring"
+              }
+            ],
+            "next": "FF52ea7392f7d77d58be687b99a25fd4cc",
+            "uuid": "ac6f3c9b-acd2-4c7b-a460-c019fc4cf6ba"
+          },
+          {
+            "event": "match",
+            "conditions": [
+              {
+                "friendly_name": "If value contains transfer",
+                "type": "contains",
+                "arguments": [
+                  "{{flow.variables.googleMessage}}"
+                ],
+                "value": "transfer"
+              }
+            ],
+            "next": "FF52ea7392f7d77d58be687b99a25fd4cc",
+            "uuid": "57d0a02b-c7d9-4f94-940f-905cb1059d46"
+          }
+        ],
+        "sid": "FFe0701acaffc24c3579343a8763bd4111"
+      },
+      {
+        "name": "SetCustomerMessageGreeting",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 680,
+            "y": 300
+          },
+          "variables": [
+            {
+              "key": "message",
+              "value": "Hi",
+              "index": "0"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FF583cb47b858aa8db70ac7144782174ae",
+            "uuid": "5c21345c-fae3-41bd-9d82-4848871d0a74"
+          }
+        ],
+        "sid": "FF6e09efaf4f4ffb4e9e614fb0d0e51c1a"
+      },
+      {
+        "name": "Speech",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 480,
+            "y": 1820
+          },
+          "variables": [
+            {
+              "key": "message",
+              "value": "{{widgets.gather_1.SpeechResult}}",
+              "index": "0"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FF583cb47b858aa8db70ac7144782174ae",
+            "uuid": "c822674b-b4d9-4bff-b022-226940e99095"
+          }
+        ],
+        "sid": "FF9ffb16c8b16ab6d4146d3310f37ef48d"
+      },
+      {
+        "name": "send_to_flex_1",
+        "type": "SendToFlex",
+        "properties": {
+          "offset": {
+            "x": -840,
+            "y": 1030
+          },
+          "workflow": "WW2df726e73c24e6318a7561c9737a9b74",
+          "channel": "TC91c22dff3e22ebd26c6b8b87df8119e3",
+          "attributes": "{ \"type\": \"inbound\", \"name\": \"{{trigger.call.From}}\",\"dialogflow\": {\n\"currentIntent\": \"{{widgets.Dialogflow.parsed.currentIntent}} \",\n\"context\": \"{{widgets.Dialogflow.parsed.context}} \"\n}}",
+          "timeout": null,
+          "priority": null,
+          "waitUrl": null,
+          "waitUrlMethod": null
+        },
+        "transitions": [
+          {
+            "event": "callComplete",
+            "conditions": [],
+            "next": null,
+            "uuid": "a455719e-4d19-4669-8be4-629ced3c9d90"
+          },
+          {
+            "event": "failedToEnqueue",
+            "conditions": [],
+            "next": null,
+            "uuid": "ee878114-b364-4ea3-93bf-b40b48672c60"
+          },
+          {
+            "event": "callFailure",
+            "conditions": [],
+            "next": null,
+            "uuid": "54397336-897a-4d27-85da-7927940c25e8"
+          }
+        ],
+        "sid": "FF8cb8f3e14560283ec7a04cc6de49167d"
+      },
+      {
+        "name": "gather_1",
+        "type": "Gather",
+        "properties": {
+          "offset": {
+            "x": 90,
+            "y": 1470
+          },
+          "timeout": 10,
+          "finish_on_key": "#",
+          "stop_gather": true,
+          "number_of_digits": null,
+          "save_response_as": null,
+          "say": "{{flow.variables.googleMessage}}",
+          "play": null,
+          "voice": "Polly.Justin",
+          "language": "en-US",
+          "loop": 1,
+          "hints": null,
+          "gather_language": "en",
+          "speech_timeout": "auto",
+          "speech_model": null,
+          "profanity_filter": "true"
+        },
+        "transitions": [
+          {
+            "event": "keypress",
+            "conditions": [],
+            "next": "FF3de8b223826d33382078c039bf385af0",
+            "uuid": "31b44412-74d7-44b7-bda1-a6409a9cd7da"
+          },
+          {
+            "event": "speech",
+            "conditions": [],
+            "next": "FF9ffb16c8b16ab6d4146d3310f37ef48d",
+            "uuid": "58582406-73ce-4dc1-8114-a5eaa3414bba"
+          },
+          {
+            "event": "timeout",
+            "conditions": [],
+            "next": null,
+            "uuid": "28907200-0baf-41c6-8940-71130b4d95f5"
+          }
+        ],
+        "sid": "FFb93c1e7c51d061583b4e598b48a74a90"
+      },
+      {
+        "name": "SendToAgent",
+        "type": "SayPlay",
+        "properties": {
+          "offset": {
+            "x": -730,
+            "y": 630
+          },
+          "say": "Please wait while we transfer you to the next available agent.",
+          "play": null,
+          "voice": null,
+          "language": null,
+          "loop": 1,
+          "digits": null
+        },
+        "transitions": [
+          {
+            "event": "audioComplete",
+            "conditions": [],
+            "next": "FF8cb8f3e14560283ec7a04cc6de49167d",
+            "uuid": "44abf8bb-0fb0-4d28-a9b6-71dbbd00b831"
+          }
+        ],
+        "sid": "FF52ea7392f7d77d58be687b99a25fd4cc"
+      },
+      {
+        "name": "DTMF",
+        "type": "SetVariables",
+        "properties": {
+          "offset": {
+            "x": 10,
+            "y": 1770
+          },
+          "variables": [
+            {
+              "key": "message",
+              "value": "{{widgets.gather_1.Digits}}"
+            }
+          ]
+        },
+        "transitions": [
+          {
+            "event": "next",
+            "conditions": [],
+            "next": "FF583cb47b858aa8db70ac7144782174ae",
+            "uuid": "02e29ca3-bc94-42cb-a9c9-1c0c456d97ca"
+          }
+        ],
+        "sid": "FF3de8b223826d33382078c039bf385af0"
+      }
+    ]
+  }
