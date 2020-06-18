@@ -8,7 +8,8 @@
     "deploy": "twilio-run deploy"
   },
   "dependencies": {
-    "@google-cloud/dialogflow": "^2.0.0"
+    "@google-cloud/dialogflow": "^2.0.0",
+    "@google-cloud/translate": "^6.0.0"
   },
   "devDependencies": {
     "twilio-run": "^2.6.0"
