@@ -32,7 +32,7 @@ const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
   try {
     const googleCreds = loadGoogleCreds(serverlessContext);
     const response = await sendToTranslate(serverlessContext, serverlessEvent, googleCreds);
-    const result = formatGoogleResponse(response);
+    const result = formatGoogleResponse(serverlessContext, response);
     return result;
   } catch (e) {
     throw serverlessHelper.formatErrorMsg(serverlessContext, 'driver', e);
@@ -42,9 +42,17 @@ const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
 const loadGoogleCreds = (serverlessContext) => {
   try {
     const googleCreds = JSON.parse(
-      Runtime.getAssets()[serverlessContext.GOOGLE_TRANSLATE_CREDS].open()
+      Runtime.getAssets()[serverlessContext.GOOGLE_TRANSLATE_CREDS_PATH].open()
     );
-    return googleCreds;
+
+    const result = {
+      credentials: {
+        client_email: googleCreds.client_email,
+        private_key: googleCreds.private_key
+      },
+      projectId: googleCreds.project_id
+    };
+    return result;
   } catch (e) {
     throw serverlessHelper.formatErrorMsg(serverlessContext, 'loadGoogleCreds', e);
   }
@@ -53,30 +61,27 @@ const loadGoogleCreds = (serverlessContext) => {
 const sendToTranslate = async (serverlessContext, serverlessEvent, googleCreds) => {
   try {
     const translationClient = new TranslationServiceClient(googleCreds);
+    const {text} = serverlessEvent;
+    const projectId = serverlessEvent.projectId ? serverlessEvent.projectId : googleCreds.projectId;
+    const location = serverlessEvent.location ? serverlessEvent.location : 'us-central1';
     const request = {
       parent: `projects/${projectId}/locations/${location}`,
       content: text,
     };
 
     const [response] = await translationClient.detectLanguage(request);
-
-    console.log('Detected Languages:');
-    for (const language of response.languages) {
-      console.log(`Language Code: ${language.languageCode}`);
-      console.log(`Confidence: ${language.confidence}`);
-    }
-    
     return response;
-
   } catch (e) {
-    throw serverlessHelper.formatErrorMsg(serverlessContext, 'sendToDialogFlow', e);
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'sendToTranslate', e);
   }
 }
 
 const formatGoogleResponse = (serverlessContext, googleResponse) => {
   try {
-    const result = {};
-    return googleResponse
+    const result = {
+      ...googleResponse
+    }
+    return result;
   } catch (e) {
     throw serverlessHelper.formatErrorMsg(serverlessContext, 'formatGoogleResponse', e);
   }

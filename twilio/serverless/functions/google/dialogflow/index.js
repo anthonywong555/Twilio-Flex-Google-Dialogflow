@@ -43,7 +43,7 @@ const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
 const loadGoogleCreds = (serverlessContext) => {
   try {
     const googleCreds = JSON.parse(
-      Runtime.getAssets()[serverlessContext.GOOGLE_DIALOGFLOW_CREDS].open()
+      Runtime.getAssets()[serverlessContext.GOOGLE_DIALOGFLOW_CREDS_PATH].open()
     );
     return googleCreds;
   } catch (e) {
@@ -53,7 +53,7 @@ const loadGoogleCreds = (serverlessContext) => {
 
 const sendToDialogFlow = async (serverlessContext, serverlessEvent, googleCreds) => {
   try {
-    const projectId = googleCreds.project_id;
+    const projectId = serverlessEvent.projectId ? serverlessEvent.projectId : googleCreds.project_id;
     const {sessionId, languageCode, query, contexts} = serverlessEvent;
 
     const client = new dialogflow.SessionsClient({'credentials': googleCreds});
