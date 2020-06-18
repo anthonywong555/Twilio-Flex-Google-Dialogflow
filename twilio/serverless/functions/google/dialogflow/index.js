@@ -1,3 +1,5 @@
+'use strict';
+
 const dialogflow = require('@google-cloud/dialogflow');
 
 let serverlessHelper = null;
@@ -13,11 +15,11 @@ exports.handler = async (context, event, callback) => {
       throw isEventValid;
     } else {
       const result = await driver(context, event, twilioClient);
-      return result;
+      return callback(null, result);
     }
 
   } catch(e) {
-    throw e;
+    return callback(e);
   }
 }
 
@@ -42,8 +44,52 @@ const validateEvent = async (serverlessEvent) => {
 
 const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
   try {
-    const sessionClient = new dialogflow.SessionsClient();
-  } catch (e) {
+    // Load 
+    const googleCreds = JSON.parse(Runtime.getAssets()['/google-dialogflow-service-account-key.json'].open());
+    const projectId = googleCreds.project_id;
+    const {sessionId, languageCode, query, contexts} = serverlessEvent;
 
+    const client = new dialogflow.SessionsClient({'credentials': googleCreds});
+    const formattedSession = client.projectAgentSessionPath(projectId , sessionId);
+    const request = {
+      session: formattedSession,
+      queryInput: {
+        text: {
+          text: query,
+          languageCode: languageCode,
+        },
+      },
+    };
+
+    if (contexts && contexts.length > 0) {
+      request.queryParams = {
+        contexts,
+      };
+    }
+
+    const responses = await client.detectIntent(request);
+    const response = responses[0];
+
+    const result = formatGoogleResponse(serverlessContext, response);
+    return result;
+  } catch (e) {
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'driver', e);
+  }
+}
+
+const formatGoogleResponse = (serverlessContext, googleResponse) => {
+  try {
+    const {queryResult} = googleResponse;
+    const text = queryResult.fulfillmentMessages[0].text.text.join('\n');
+    const intent = queryResult.intent.displayName;
+    const language = queryResult.languageCode;
+    const result = {
+      text,
+      intent,
+      language
+    };
+    return result;;
+  } catch (e) {
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'formatGoogleResponse', e);
   }
 }
