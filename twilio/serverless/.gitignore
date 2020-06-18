@@ -117,3 +117,6 @@ dist
 
 # Google Dialogflow Service Account Key
 google-dialogflow-service-account-key.private.json
+
+# Google Translate Service Account Key
+google-translate-service-account-key.private.json

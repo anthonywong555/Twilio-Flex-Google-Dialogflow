@@ -30,7 +30,7 @@ const loadServerlessModules = async () => {
 
 const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
   try {
-    const googleCreds = loadGoogleCreds();
+    const googleCreds = loadGoogleCreds(serverlessContext);
     const response = await sendToTranslate(serverlessContext, serverlessEvent, googleCreds);
     const result = formatGoogleResponse(response);
     return result;
@@ -39,10 +39,10 @@ const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
   }
 }
 
-const loadGoogleCreds = () => {
+const loadGoogleCreds = (serverlessContext) => {
   try {
     const googleCreds = JSON.parse(
-      Runtime.getAssets()['/google-dialogflow-service-account-key.json'].open()
+      Runtime.getAssets()[serverlessContext.GOOGLE_TRANSLATE_CREDS].open()
     );
     return googleCreds;
   } catch (e) {
