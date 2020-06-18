@@ -9,14 +9,8 @@ exports.handler = async (context, event, callback) => {
     const twilioClient = require('twilio')(context.ACCOUNT_SID, context.AUTH_TOKEN);
     await loadServerlessModules();
 
-    const isEventValid = await validateEvent(event);
-
-    if(isEventValid !== true) {
-      throw isEventValid;
-    } else {
-      const result = await driver(context, event, twilioClient);
-      return callback(null, result);
-    }
+    const result = await driver(context, event, twilioClient);
+    return callback(null, result);
 
   } catch(e) {
     return callback(e);
@@ -34,18 +28,31 @@ const loadServerlessModules = async () => {
   }
 }
 
-const validateEvent = async (serverlessEvent) => {
+const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
   try {
-    return true;
+    // Load Google Creds from Assets
+    const googleCreds = loadGoogleCreds();
+    const response = await sendToDialogFlow(serverlessContext, serverlessEvent, googleCreds);
+    const result = formatGoogleResponse(serverlessContext, response);
+    return result;
   } catch (e) {
-    throw serverlessHelper.formatErrorMsg(serverlessContext, 'validateEvent', e);
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'driver', e);
   }
 }
 
-const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
+const loadGoogleCreds = () => {
   try {
-    // Load 
-    const googleCreds = JSON.parse(Runtime.getAssets()['/google-dialogflow-service-account-key.json'].open());
+    const googleCreds = JSON.parse(
+      Runtime.getAssets()['/google-dialogflow-service-account-key.json'].open()
+    );
+    return googleCreds;
+  } catch (e) {
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'loadGoogleCreds', e);
+  }
+}
+
+const sendToDialogFlow = async (serverlessContext, serverlessEvent, googleCreds) => {
+  try {
     const projectId = googleCreds.project_id;
     const {sessionId, languageCode, query, contexts} = serverlessEvent;
 
@@ -69,11 +76,9 @@ const driver = async(serverlessContext, serverlessEvent, twilioClient) => {
 
     const responses = await client.detectIntent(request);
     const response = responses[0];
-
-    const result = formatGoogleResponse(serverlessContext, response);
-    return result;
+    return response;
   } catch (e) {
-    throw serverlessHelper.formatErrorMsg(serverlessContext, 'driver', e);
+    throw serverlessHelper.formatErrorMsg(serverlessContext, 'sendToDialogFlow', e);
   }
 }
 
