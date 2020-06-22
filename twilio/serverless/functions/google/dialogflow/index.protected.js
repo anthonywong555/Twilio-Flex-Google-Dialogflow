@@ -54,16 +54,16 @@ const loadGoogleCreds = (serverlessContext) => {
 const sendToDialogFlow = async (serverlessContext, serverlessEvent, googleCreds) => {
   try {
     const projectId = serverlessEvent.projectId ? serverlessEvent.projectId : googleCreds.project_id;
-    const {sessionId, languageCode, query, contexts} = serverlessEvent;
+    const {sessionId, languageCode, text, contexts} = serverlessEvent;
 
     const client = new dialogflow.SessionsClient({'credentials': googleCreds});
-    const formattedSession = client.projectAgentSessionPath(projectId , sessionId);
+    const session = client.projectAgentSessionPath(projectId , sessionId);
     const request = {
-      session: formattedSession,
+      session,
       queryInput: {
         text: {
-          text: query,
-          languageCode: languageCode,
+          text,
+          languageCode,
         },
       },
     };
